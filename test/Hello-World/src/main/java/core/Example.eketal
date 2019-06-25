@@ -24,8 +24,9 @@ eventclass Example{
 	
 	event eventWorld(): call(* core.HelloWorld.worldMethod());
 	
-	reaction before automatonConstructor.firstState{
+	reaction after automatonConstructor.firstState{
 		System.out.println("estado");
+		
 	}
 	
 }

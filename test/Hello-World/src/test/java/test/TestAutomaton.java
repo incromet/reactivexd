@@ -25,20 +25,28 @@ public class TestAutomaton {
         Event eventHello = new NamedEvent("eventHello");
         Event eventWorld = new NamedEvent("eventWorld");
         
-		System.out.println(instance.getCurrentState().toString());
+		System.out.println("co.edu.escuelaing.reactivexd.core.State@bc6893");
 		String state = instance.getCurrentState().toString();
 		assertFalse(instance.evaluate(eventWorld));
 		
-		System.out.println(instance.getCurrentState().toString());
+		System.out.println("Entered value was: Hello");
+		
+		System.out.println("co.edu.escuelaing.reactivexd.core.State@bc6893");
 		assertEquals(state, instance.getCurrentState().toString());
 		assertTrue(instance.evaluate(eventHello));
 		
-		System.out.println(instance.getCurrentState().toString());
+		System.out.println("Entered value was: Hi");
+		
+		System.out.println("co.edu.escuelaing.reactivexd.core.State@f7fead");
 		assertNotEquals(state, instance.getCurrentState().toString());
 		assertTrue(instance.evaluate(eventWorld));
 		
-		System.out.println(instance.getCurrentState().toString());
+		System.out.println("Entered value was: How are you");
+		
+		System.out.println("co.edu.escuelaing.reactivexd.core.State@f7fead");
 		assertFalse(instance.getCurrentState().getAccept());
+		
+		System.out.println("Entered value was: Good");
 		
     }
     
