@@ -1,0 +1,9 @@
+package local;
+
+import org.jboss.cache.Fqn;
+import org.jboss.cache.Cache;
+
+	Observable<Event> friendA = new Observable (call(* Cache.get(Fqn, Object)) && !localhost);
+	
+	Observable<Event> friendB = new Observable (call(* Cache.put(Fqn, Object, Object)) && !localhost);
+	
