@@ -1,0 +1,217 @@
+grammar co.edu.icesi.eketal.Eketal with jbase.Jbase
+
+import "http://www.eclipse.org/xtext/xbase/Xbase"
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+import "http://www.eclipse.org/xtext/common/JavaVMTypes" as jvmTypes
+
+generate eketal "http://www.icesi.edu.co/eketal/Eketal"
+
+//////////////////////////////////////////////////////////////////////////
+/////////////////////////////Event Class//////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+Model:
+	('package' name = QualifiedName ->';'?)?
+	importSection = XImportSection?
+	typeDeclaration = EventClass?
+;
+
+EventClass:
+	'eventclass' name=ID ('protocol' '=' protocol=Protocol)? ('bindintf' '=' interface=STRING)? '{' declarations+=Decl* '}'
+;
+
+enum Protocol:
+	UDP		|
+	TCP		|
+	TCP_NIO2 
+;
+
+Decl:
+	Automaton | Ltl
+	| Rc
+	| MSig
+	| JVarD
+	| Group
+	| EvDecl
+;
+
+JVarD:
+	name=ValidID ':' type=JvmTypeReference//Variable en java
+;
+
+MSig:
+	'op' name=ValidID '(' (params+=FullJvmFormalParameter (',' params+=FullJvmFormalParameter)*)? ')' (':' type=JvmTypeReference)? 
+		body=XBlockExpression
+;
+
+//////////////////////////////////////
+//Event Declaration
+//////////////////////////////////////
+
+EvDecl:
+	'event' name=ID'(' (params+=FullJvmFormalParameter (',' params+=FullJvmFormalParameter)*)? ')'":"eventos+=OrEvent*';'
+;
+
+OrEvent returns EventExpression:
+	AndEvent ({OrEvent.left=current} op='||' right=AndEvent)*
+;
+
+AndEvent returns EventExpression:
+	NotEvent ({AndEvent.left=current} op='&&' right=NotEvent)*
+;
+
+NotEvent returns EventExpression:
+	AtomEvent | UnaryExpresion
+;
+
+UnaryExpresion returns EventExpression:{UnaryEvent}
+	op='!' expr=AtomEvent
+	//{UnaryEvent} => op='!' expr=AtomEvent //TODO significado de =>
+;
+
+AtomEvent returns EventExpression:
+	tipoEvento=EventPredicate | '('OrEvent')'
+;
+
+EventPredicate:
+	KindAttribute
+	| Trigger
+;
+	
+KindAttribute:
+	'host' '('hostgroup=[Group]')'
+	| 'on' '('ongroup=[Group]')'
+	| 'if' condition=XParenthesizedExpression
+//	| 'eq'"("JExp","JExp")"
+;
+
+Trigger:
+	triggerType=TPrefix '(' (returndef=TypeReturn)? esig=QualifiedName'('(params+=JvmTypeReference 
+		(',' params+=JvmTypeReference)* )?')'')'
+;
+
+enum TPrefix:
+	call | execution
+;
+
+TypeReturn returns JVMTYPE:
+	astk=ANY | jvmRef=JvmTypeReference
+;
+
+terminal ANY:
+	'*'
+;
+
+Group:
+	'group' name=ID
+	'{' hosts+=Host* '}'
+;
+	
+Host:
+	ip=Ip
+	| groupId=[Group]
+;
+
+Ip:
+	"jphost" | "localhost" | 
+	(INT '.' (INT '.' (INT '.')?)?)? (INT | ANY  | '[' INT '-' INT ']') 
+;
+
+//////////////////////////////////////
+////Automata definicion
+//////////////////////////////////////
+//TODO estado de finalización default
+Automaton:
+	'automaton' name=ID '('(params+=FullJvmFormalParameter 
+        (',' params+=FullJvmFormalParameter)*)?')' '{' steps+=Step* '}'
+;
+        
+Step:
+	(type=StateType)? name=ID ( ':' '('transitions+=TransDef')' ('||' '('transitions+=TransDef* ')')* )? ';'
+;
+
+TransDef:
+	event=[EvDecl] '->' target=[Step]//XExpression//estado muerto
+;
+
+enum StateType:
+	state |
+	start |
+	end
+;
+
+//////////////////////////////////////
+////Linear Temporal Logic definition
+//////////////////////////////////////
+//Unary->Binary
+//Bind from right to left
+//always eventually p = (always (eventually p))
+//p until q until r = p until (q until r)
+//until -> &&,||,->
+//http://www.cds.caltech.edu/~murray/courses/afrl-sp12/L3_ltl-24Apr12.pdf
+Ltl:
+	'ltl' name=ID '('(params+=FullJvmFormalParameter 
+        (',' params+=FullJvmFormalParameter)*)?')' '{' predicate=LtlThen '}'
+;
+
+LtlThen returns LtlExpression:
+	LtlOr ({LtlThen.left=current} op='->' right=LtlOr)*
+;
+
+LtlOr returns LtlExpression:
+	LtlAnd ({LtlOr.left=current} op='||' right=LtlAnd)*
+;
+
+LtlAnd  returns LtlExpression:
+	LtlUntil ({LtlAnd.left=current} op='&&' right=LtlUntil)*
+;
+
+LtlUntil  returns LtlExpression:
+	LtlUnary ({LtlUntil.left=current} op='until' right=LtlUnary)*
+;
+
+LtlUnary returns LtlExpression:
+	LtlAtom | LtlAlways | LtlNext | LtlEventually | LtlNot
+;
+
+LtlNext returns LtlExpression:{UnaryLtl}
+	op='next' expr=LtlAtom
+;
+
+LtlAlways returns LtlExpression:{UnaryLtl}
+	op='always' expr=LtlAtom
+;
+
+LtlEventually returns LtlExpression:{UnaryLtl}
+	op='eventually' expr=LtlAtom
+;
+
+LtlNot returns LtlExpression:{UnaryLtl}
+	op='!' expr=LtlAtom
+;
+
+LtlAtom returns LtlExpression:
+	event=[EvDecl] | '('LtlThen')'
+;
+
+//////////////////////////////////////
+////Reaction definition
+//////////////////////////////////////
+Rc:
+	(syncex="syncex")? 'reaction' pos=Pos automaton=[Automaton]'.'state=[Step] body=Body
+//	(syncex="syncex")? 'reaction' pos=Pos (state=[Step|QFN]) body=Body//This implementations works with the fully qualifiedname, so the program suggested all the name (package.eventclass.automaton.step) instead of only automaton.step
+;
+
+//QFN:
+//    ID ('.' ID)*
+//;
+
+enum Pos:
+	before | around | after
+;
+
+Body:
+	body=XBlockExpression
+//	body=XBlockExpression | 'addGroup' '('grupo=[Group]')' | 'removeGroup' '('grupo=[Group]')'
+;

@@ -1,0 +1,30 @@
+package local;
+
+import org.jboss.cache.Fqn;
+import org.jboss.cache.Cache;
+eventclass Datarace{
+
+	group localGroup{
+		localhost
+	}
+	
+	automaton seqEventDetector(){
+ 		start initialState: (consult -> firtsState)||(insert -> initialState);
+ 		firtsState: (consult -> initialState)||(insert -> secondState);
+ 		secondState: (consult -> initialState)||(insert -> findSequenceState);
+ 		findSequenceState: (consult -> finalState)||(insert -> finalState);
+ 		end finalState: (consult -> finalState)||(insert -> finalState);
+ 	}
+ 	
+	event consult(): call(* Cache.get(Fqn, Object)) && host(localGroup);
+	
+	event insert(): call(* Cache.put(Fqn, Object, Object)) && host(localGroup);
+	
+ 	reaction before seqEventDetector.findSequenceState{
+		String msg = "Reaction detected";
+		System.out.println("----------------------------------------");
+		System.out.println(msg);
+		System.out.println("----------------------------------------");
+	}
+	
+}
