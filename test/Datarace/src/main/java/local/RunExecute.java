@@ -65,7 +65,7 @@ public class RunExecute {
 		
 		bf.close();
 				
-		System.out.println("[INFO] Stopped transation");
+		System.out.println("[INFO] Stopped transaction");
 		
 		System.exit(0);
 	}
