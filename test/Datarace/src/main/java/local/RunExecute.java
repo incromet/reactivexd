@@ -38,7 +38,17 @@ public class RunExecute {
 		cache.create();
 		cache.start();
 		
-		Fqn fqn = Fqn.fromString("/datarace/example");
+		System.out.println("Start to chat!");
+		String msn = "";
+		Thread thrd = new SleepThread(3000); 
+		thrd.run();
+		while (msn != "finish") {
+			msn = bf.readLine();
+			thrd.run();
+			System.out.println(msn);
+		}
+		
+		/*Fqn fqn = Fqn.fromString("/datarace/example");
 		
 		System.out.println("[INFO] Preparing to read a value");
 		Thread thrd = new SleepThread(10000); 
@@ -58,7 +68,7 @@ public class RunExecute {
 		cache.get(fqn, "value3");
 		
 		thrd = new SleepThread(10000); 
-		thrd.run();
+		thrd.run();*/
 		
 		cache.stop();
 		cache.destroy();

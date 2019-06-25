@@ -1,0 +1,11 @@
+package core;
+	
+	/*
+	 * This example prints the messages in real time between two nodes
+	 */
+	
+	Observable<Event> friendA = new Observable (call(* core.GroupChat.main() ) && !localhost);
+	
+	Observable<Event> friendB = new Observable (call(* core.GroupChat.main()) && !localhost);
+	
+	// The printing comes from the execution of the instances of Java class
