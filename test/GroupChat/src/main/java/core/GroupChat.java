@@ -1,9 +1,11 @@
+package core;
+
 import java.net.*; 
 import java.io.*; 
 import java.util.*; 
 public class GroupChat 
 { 
-	private static final String TERMINATE = "Exit"; 
+	private static final String TERMINATE = "end"; 
 	static String name; 
 	static volatile boolean finished = false; 
 	public static void main(String[] args) 
@@ -14,10 +16,11 @@ public class GroupChat
 		//{ 
 			try
 			{ 
+				System.out.println("[INFO] GroupChat is now running!");
 				InetAddress group = InetAddress.getByName("239.0.0.0"); 
 				int port = 1234;//Integer.parseInt(args[1]); 
+				System.out.println("Enter name: "); 
 				Scanner sc = new Scanner(System.in); 
-				System.out.print("Enter your name: "); 
 				name = sc.nextLine(); 
 				MulticastSocket socket = new MulticastSocket(port); 
 			
@@ -97,7 +100,7 @@ class ReadThread implements Runnable
 			} 
 			catch(IOException e) 
 			{ 
-				System.out.println("Socket closed!"); 
+				System.out.println("Conversation finished!"); 
 			} 
 		} 
 	} 
