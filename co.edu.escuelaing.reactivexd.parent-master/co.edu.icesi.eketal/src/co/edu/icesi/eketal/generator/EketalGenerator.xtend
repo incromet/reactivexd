@@ -65,7 +65,75 @@ class EketalGenerator implements IGenerator{
 	def prepareFileName(String packageName, String fileName) {
 		return (packageName + "." + fileName).replace(".", File.separator) + ".aj"
 	}
+	/*
 	
+	
+	def CharSequence generateObservables(EventClass modelo, String packageName, Set<String> libraries){
+		aspectClass = modelo.name
+		var packageDefinition = '''package «packageName»;
+		
+		'''	
+		var observables = modelo.declarations.filter(Automaton)
+		var Set<String> importedLibraries = new TreeSet()
+		importedLibraries+=libraries
+		var pointcuts = new TreeSet<String>
+		
+		var after = new HashMap<String, String>()
+		var before = new HashMap<String, String>()
+		
+		if(modelo.declarations.containsObservable)			
+		importedLibraries+="co.edu.icesi.eketal.groupsimpl.*"
+		importedLibraries+="co.edu.icesi.eketal.handlercontrol.*"
+		importedLibraries+="co.edu.icesi.ketal.core.ObsrvDecl"
+		importedLibraries+="co.edu.icesi.ketal.core.ObsrvAssig"
+		importedLibraries+="co.edu.icesi.ketal.core.Event"
+		importedLibraries+="java.util.Map"
+		importedLibraries+="java.util.HashMap"
+		
+		var aspect = '''
+		public aspect «aspectClass.toFirstUpper»{
+			
+			«FOR event:modelo.declarations»
+				«IF event instanceof ObsrvDecl
+					pointcut «event.name.toFirstLower»():
+						«createPointCut(event as ObsrvDecl, pointcuts)»;
+					//after() returning (Object o): «event.name.toFirstLower»() {
+					//	System.out.println("[Aspectj] Returned normally with " + o);
+					//}
+					//after() throwing (Exception e): «event.name.toFirstLower»() {
+					//	System.out.println("[Aspectj] Threw an exception: " + e);
+					//}
+					after(): «event.name.toFirstLower»(){
+						«IF !observables.isEmpty»
+							Event event = new NamedEvent("«event.name»");
+							«EketalJvmModelInferrer.handlerClassName» distribuidor = «EketalJvmModelInferrer.handlerClassName».getInstance();
+							event.setLocalization(distribuidor.getAsyncAddress());
+							Map map = new HashMap<String, Object>();
+							distribuidor.multicast(event, map);
+						«ENDIF»
+					}
+				«ENDIF»
+			«ENDFOR»
+			
+			«FOR pointcut:pointcuts»
+				«pointcut»;
+			«ENDFOR»
+		}
+		'''
+		var imports = '''
+		«FOR tipo:importedLibraries»
+			import «tipo»;
+		«ENDFOR»
+		
+		'''
+		return packageDefinition+imports+aspect
+		
+	}
+	
+	
+	
+	
+	*/
 	def CharSequence generate(EventClass modelo, String packageName, Set<String> libraries){
 		aspectClass = modelo.name
 		var packageDefinition = '''package «packageName»;

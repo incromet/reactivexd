@@ -6,7 +6,7 @@ import core.*;
 
 public aspect GroupChat {
 	
-	pointcut eventgroupchat(): call(* core.GroupChat.main() );
+	pointcut eventGroupchat(): call(* core.GroupChat.main() );
 	
 	after(): consult(){
 		Event event = new NamedEvent("consult");
