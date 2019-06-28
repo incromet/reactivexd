@@ -8,21 +8,21 @@ public class GroupChat
 	static volatile boolean finished = false; 
 	public static void main(String[] args) 
 	{ 
-		if (args.length != 2) 
-			System.out.println("Two arguments required: <multicast-host> <port-number>"); 
-		else
-		{ 
+		//if (args.length != 0) 
+			//System.out.println("Two arguments required: <multicast-host> <port-number>"); 
+		//else
+		//{ 
 			try
 			{ 
-				InetAddress group = InetAddress.getByName(args[0]); 
-				int port = Integer.parseInt(args[1]); 
+				InetAddress group = InetAddress.getByName("239.0.0.0"); 
+				int port = 1234;//Integer.parseInt(args[1]); 
 				Scanner sc = new Scanner(System.in); 
 				System.out.print("Enter your name: "); 
 				name = sc.nextLine(); 
 				MulticastSocket socket = new MulticastSocket(port); 
 			
 				// Since we are deploying 
-				socket.setTimeToLive(0); 
+				socket.setTimeToLive(1); 
 				//this on localhost only (For a subnet set it as 1) 
 				
 				socket.joinGroup(group); 
@@ -62,7 +62,7 @@ public class GroupChat
 				System.out.println("Error reading/writing from/to socket"); 
 				ie.printStackTrace(); 
 			} 
-		} 
+		//} 
 	} 
 } 
 class ReadThread implements Runnable 
