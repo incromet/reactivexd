@@ -101,6 +101,7 @@ class ReadThread implements Runnable
 			catch(IOException e) 
 			{ 
 				System.out.println("Conversation finished!"); 
+				System.out.println("[Aspectj] After: Recognized an event in ObservableConstructor \n");
 			} 
 		} 
 	} 
