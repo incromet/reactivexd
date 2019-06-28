@@ -3,7 +3,6 @@ tmp
 bin
 target
 generated
-generated-sources
 src-gen
 xtend-gen
 model
