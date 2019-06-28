@@ -16,5 +16,5 @@ public aspect GroupChat {
 		distribuidor.multicast(event, map);
 		
 		System.out.println("[Aspectj] After: Recognized an event in ObservableConstructor");
-		
+	}
 }

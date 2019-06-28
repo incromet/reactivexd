@@ -68,6 +68,8 @@ class EketalGenerator implements IGenerator{
 	/*
 	
 	
+	
+	
 	def CharSequence generateObservables(EventClass modelo, String packageName, Set<String> libraries){
 		aspectClass = modelo.name
 		var packageDefinition = '''package «packageName»;
@@ -129,6 +131,8 @@ class EketalGenerator implements IGenerator{
 		return packageDefinition+imports+aspect
 		
 	}
+	
+	
 	
 	
 	
