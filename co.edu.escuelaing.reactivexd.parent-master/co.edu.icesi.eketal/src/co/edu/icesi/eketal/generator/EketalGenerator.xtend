@@ -75,20 +75,19 @@ class EketalGenerator implements IGenerator{
 		var packageDefinition = '''package «packageName»;
 		
 		'''	
-		var observables = modelo.declarations.filter(Automaton)
+		var observables = modelo.declarations.filter(Observables)
 		var Set<String> importedLibraries = new TreeSet()
 		importedLibraries+=libraries
 		var pointcuts = new TreeSet<String>
 		
 		var after = new HashMap<String, String>()
-		var before = new HashMap<String, String>()
 		
 		if(modelo.declarations.containsObservable)			
-		importedLibraries+="co.edu.icesi.eketal.groupsimpl.*"
-		importedLibraries+="co.edu.icesi.eketal.handlercontrol.*"
-		importedLibraries+="co.edu.icesi.ketal.core.ObsrvDecl"
-		importedLibraries+="co.edu.icesi.ketal.core.ObsrvAssig"
-		importedLibraries+="co.edu.icesi.ketal.core.Event"
+		importedLibraries+="co.edu.escuelaing.reactivexd.groupsimpl.*"
+		importedLibraries+="co.edu.escuelaing.reactivexd.handlercontrol.*"
+		importedLibraries+="co.edu.escuelaing.reactivexd.core.ObsrvDecl"
+		importedLibraries+="co.edu.escuelaing.reactivexd.core.NamedEvent"
+		importedLibraries+="co.edu.escuelaing.reactivexd.core.Event"
 		importedLibraries+="java.util.Map"
 		importedLibraries+="java.util.HashMap"
 		
@@ -99,19 +98,14 @@ class EketalGenerator implements IGenerator{
 				«IF event instanceof ObsrvDecl
 					pointcut «event.name.toFirstLower»():
 						«createPointCut(event as ObsrvDecl, pointcuts)»;
-					//after() returning (Object o): «event.name.toFirstLower»() {
-					//	System.out.println("[Aspectj] Returned normally with " + o);
-					//}
-					//after() throwing (Exception e): «event.name.toFirstLower»() {
-					//	System.out.println("[Aspectj] Threw an exception: " + e);
-					//}
 					after(): «event.name.toFirstLower»(){
 						«IF !observables.isEmpty»
 							Event event = new NamedEvent("«event.name»");
-							«EketalJvmModelInferrer.handlerClassName» distribuidor = «EketalJvmModelInferrer.handlerClassName».getInstance();
+							«ReactiveXDJvmModelInferrer.handlerClassName» distribuidor = «ReactiveXDJvmModelInferrer.handlerClassName».getInstance();
 							event.setLocalization(distribuidor.getAsyncAddress());
 							Map map = new HashMap<String, Object>();
 							distribuidor.multicast(event, map);
+							System.out.println("[Aspectj] After: Recognized an event in ObservableConstructor");
 						«ENDIF»
 					}
 				«ENDIF»

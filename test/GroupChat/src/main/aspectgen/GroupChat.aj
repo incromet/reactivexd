@@ -1,15 +1,15 @@
-package co.edu.icesi.eketal.aspects;
+package co.edu.escuelaing.reactivexd.aspects;
 		
-import co.edu.icesi.eketal.groupsimpl.*;
-import co.edu.icesi.eketal.handlercontrol.*;
+import co.edu.escuelaing.reactivexd.groupsimpl.*;
+import co.edu.escuelaing.reactivexd.handlercontrol.*;
 import core.*;
 
 public aspect GroupChat {
 	
 	pointcut eventGroupchat(): call(* core.GroupChat.main() );
 	
-	after(): consult(){
-		Event event = new NamedEvent("consult");
+	after(): eventGroupchat(){
+		Event event = new NamedEvent("eventGroupchat");
 		_EventHandler distribuidor = _EventHandler.getInstance();
 		event.setLocalization(distribuidor.getAsyncAddress());
 		Map map = new HashMap<String, Object>();
